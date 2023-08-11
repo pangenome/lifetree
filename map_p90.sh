@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=128
+#SBATCH --cpus-per-task=32
 #SBATCH --partition=thin
 #SBATCH --time=48:00:00
 
 # map the vgp290 to itself at 90% identity 5kb segments
 
 nix_run=/home/egarrison/bin/nix-it
-wfmash=/nix/store/8glk26ysyhr9y5m4sbi1k4faacjw6cm9-wfmash-0.10.6/bin/wfmash
+wfmash=/nix/store/gpzlqsy0b5sjywwy1nhvfmrivwbqss7i-wfmash-0.10.7/bin/wfmash
 time=/usr/bin/time
 
 base=/gpfs/nvme1/0/egarrison/lifetree
@@ -24,13 +24,14 @@ echo "mapping against $id = $target"
 
 $time -v $nix_run \
       $wfmash \
+      -t 32 \
       -m \
-      -t 128 \
+      -Y# \
+      -P $prefix \
+      -n 1 \
       -p 90 \
       -s 5k \
       -c 20k \
-      -n 1 \
-      -P $prefix \
       $seqs \
       >$out/$target.paf 2>$out/$target.log \
       && touch $out/$target.ok
