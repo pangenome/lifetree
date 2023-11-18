@@ -12,13 +12,13 @@ data <- read.delim(path)
 # Function to filter data for a given chromosome
 filter_data_for_chromosome <- function(data, chromosome) {
     data %>%
-        filter(target.seq == chromosome)
+        filter(target.name == chromosome)
 }
 
 # Unique list of chromosomes
-chromosomes <- unique(data$target.seq)
+chromosomes <- unique(data$target.name)
 
-# Find the maximum length of target.seq
+# Find the maximum length of target.name
 max_target_length <- max(data$target.end)
 
 # List to store individual ggplot objects
@@ -27,15 +27,15 @@ plots <- list()
 for (chrom in chromosomes) {
   filtered_data <- filter_data_for_chromosome(data, chrom)
   
-  p <- ggplot(filtered_data, aes(x = target.start, y = query.seq, fill = identity)) +
+  p <- ggplot(filtered_data, aes(x = target.start, y = query.name, fill = perID_by_events)) +
     geom_tile() +
-    scale_fill_gradient(low = "blue", high = "red") +
+    scale_fill_gradient(low = "#B3B3B3", high = "#000000", limits = c(70, 100)) +
     scale_x_continuous(limits = c(0, max_target_length)) + # Adjust x-axis scale
     theme_minimal() +
     labs(title = paste("all vs.", chrom),
          x = "queries",
          y = "target",
-         fill = "identity") +
+         fill = "perID_by_events") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   plots[[chrom]] <- p
 }
