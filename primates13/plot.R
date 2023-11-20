@@ -40,10 +40,11 @@ plots <- list()
 for (chrom in chromosomes) {
   filtered_data <- filter_data_for_chromosome(data, chrom)
   filtered_data <- filter_data_for_query(filtered_data, min_query_length)
-  p <- ggplot(filtered_data, aes(x = target.start, y = query.name, fill = identity)) +
+  p <- ggplot(filtered_data, aes(x = target.start, y = query.name, fill = identity, color = identity)) +
     geom_tile() +
     scale_fill_viridis_c() +
-    theme_minimal() +
+    scale_color_viridis_c() +
+    theme_bw() +
     labs(title = paste("all vs.", chrom),
          x = "queries",
          y = "target",
@@ -55,8 +56,9 @@ for (chrom in chromosomes) {
   # replace any hashes in names with _
   name <- gsub("#", "_", chrom)
   # scale height by number of queries in dataset
-  height <- length(unique(filtered_data$query.name)) * 0.15
-  ggsave(paste0(path, "_", name, ".heat.pdf"), p, width = 10, height = height, limitsize = FALSE)
+  height <- length(unique(filtered_data$query.name)) * 0.2
+  ggsave(paste0(path, "_", name, "_", min_query_length, ".heat.pdf"), p, width = 10, height = height, limitsize = FALSE)
+  ggsave(paste0(path, "_", name, "_", min_query_length, ".heat.png"), p, width = 10, height = height, limitsize = FALSE)
 }
 
 # Combine plots
