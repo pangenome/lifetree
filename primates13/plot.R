@@ -6,6 +6,8 @@ library(patchwork)
 
 args <- commandArgs(trailingOnly = TRUE)
 path <- args[1]
+# min length of mappings on a query chromosome to be included in plot
+min_query_length <- as.numeric(args[2])
 
 data <- read.delim(path)
 
@@ -14,6 +16,17 @@ filter_data_for_chromosome <- function(data, chromosome) {
     data %>%
         filter(target.name == chromosome)
 }
+
+# Filter data for query chromosomes whose sum of mapping lengths in the data is greater than min_query_length
+filter_data_for_query <- function(data, min_query_length) {
+    data %>%
+        group_by(query.name) %>%
+        summarise(query_length = sum(query.end - query.start)) %>%
+        filter(query_length > min_query_length) %>%
+        select(query.name) %>%
+        inner_join(data, by = "query.name")
+}
+
 
 # Unique list of chromosomes
 chromosomes <- unique(data$target.name)
@@ -26,8 +39,8 @@ plots <- list()
 
 for (chrom in chromosomes) {
   filtered_data <- filter_data_for_chromosome(data, chrom)
-  
-  p <- ggplot(filtered_data, aes(x = target.start, y = query.name, fill = identity, height = identity)) +
+  filtered_data <- filter_data_for_query(filtered_data, min_query_length)
+  p <- ggplot(filtered_data, aes(x = target.start, y = query.name, fill = identity)) +
     geom_tile() +
     scale_fill_viridis_c() +
     theme_minimal() +
@@ -41,7 +54,9 @@ for (chrom in chromosomes) {
   #plots[[chrom]] <- p
   # replace any hashes in names with _
   name <- gsub("#", "_", chrom)
-  ggsave(paste0(path, "_", name, ".heat.pdf"), p, width = 10, height = 10, limitsize = FALSE)
+  # scale height by number of queries in dataset
+  height <- length(unique(filtered_data$query.name)) * 0.15
+  ggsave(paste0(path, "_", name, ".heat.pdf"), p, width = 10, height = height, limitsize = FALSE)
 }
 
 # Combine plots
