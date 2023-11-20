@@ -2,11 +2,14 @@
 
 ## Mapping
 
-The `wfmash-v0.12.0_map-p70.sh` script is used to generate mappings between the genome and itself.
+The `wfmash-v0.12.0_map-p70.sh` script is used to generate mappings between all genomes and each target genome.
+By running this for all genomes, we can evoke an all-to-all homology mapping and base-level alignment in parallel.
 
-It does this by splitting the genome into overlapping 5kb segments and mapping each segment to the full genome. Mappings are filtered to keep only those with >70% identity and a cumulative length >20kb. 
+Mapping is accomplished by the `mashmap3` algorithm as parameterized in `wfmash -m`.
+It's achieved by splitting each query genome into overlapping 5kb segments and mapping each segment to the chosen target.
+Mappings are filtered to keep only those with >70% identity and a cumulative length >20kb. 
 
-Specifically, it runs `wfmash` with these key parameters:
+The script runs `wfmash` with these key parameters:
 
 - `-m` - generate mappings (instead of alignments)  
 - `-p 70` - minimum 70% identity
@@ -17,7 +20,7 @@ This results in PAF format mapping files for each target sequence in the genome.
 
 ## Alignment
 
-The `wfmash-v0.12.0_aln-p70.sh` script is then used to convert the mappings to alignments.
+The `wfmash-v0.12.0_aln-p70.sh` script can then be used to convert the mappings to alignments.
 
 It takes the PAF mapping files generated in the previous step as input. 
 
@@ -27,7 +30,7 @@ This results in aligned PAF files for each target sequence which include `--eqx`
 
 ## Visualization
 
-The `plot.R` script is then used to visualize the mappings. 
+The `plot.R` script is then used to visualize the mappings. In this example we use the homology mappings only, for simplicity.
 
 It loads the mapping PAF file and bins the mappings into windows along each target chromosome using `bedtools intersect`.
 
@@ -59,3 +62,9 @@ sbatch -a 1-13 wfmash-v0.12.0_map-p70.sh
 ```
 
 This will generate heatmap images for each chromosome showing the mapping results.
+
+## Data
+
+* Mappings only (data shown here) https://garrisonlab.s3.amazonaws.com/t2t-primates/primates13-v0.1-wfmash-01f812e5-map.tar.gz 
+* Alignments plus mappings (full cigars for all homologies shown here) https://garrisonlab.s3.amazonaws.com/t2t-primates/primates13-v0.1-wfmash-01f812e5.tar.gz
+* Assemblies with names formatted as shown here: https://garrisonlab.s3.amazonaws.com/t2t-primates/primates13.fa.gz 
