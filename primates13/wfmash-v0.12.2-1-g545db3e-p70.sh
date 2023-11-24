@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=alignment
+#SBATCH --job-name=wfmash
 #SBATCH --account=TG-MCB140147
 #SBATCH --constraint="lustre"
-#SBATCH --output=map_%j.out
-#SBATCH --error=map_%j.err
+#SBATCH --output=wfmash_%j.out
+#SBATCH --error=wfmash_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
 #SBATCH --time=2-00:00:00
