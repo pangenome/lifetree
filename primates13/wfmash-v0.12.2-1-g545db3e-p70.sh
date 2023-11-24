@@ -1,0 +1,54 @@
+#!/bin/bash
+#SBATCH --job-name=alignment
+#SBATCH --account=TG-MCB140147
+#SBATCH --constraint="lustre"
+#SBATCH --output=map_%j.out
+#SBATCH --error=map_%j.err
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=128
+#SBATCH --time=2-00:00:00
+#SBATCH --partition=compute
+
+# map t2t-primates to itself at 70% identity 5kb segments
+# skipping self alignments
+
+wfmash=~/wfmash/wfmash-v0.12.2-1-g545db3e.sif
+time=/usr/bin/time
+
+module load singularitypro
+
+# Determine number of CPUs to use
+CPUS=$(($SLURM_NTASKS_PER_NODE))
+base=/expanse/lustre/scratch/egarrison/temp_project/t2t-primates
+seqs=$base/primates13.20231122.fa.gz
+out=$base/p70_v2
+mkdir -p $out
+
+id=$SLURM_ARRAY_TASK_ID
+target=$(head -$id $base/refs.txt | tail -1)
+prefix=$target'#'
+
+echo "mapping against $id = $target on $(hostname)"
+
+$time singularity run --bind /scratch,/expanse \
+      $wfmash -t $CPUS \
+      -m \
+      -P $prefix \
+      -n 1 \
+      -p 70 \
+      -s 5k \
+      -c 20k \
+      $seqs \
+      >$out/$target.map.paf \
+      2>$out/$target.map.log \
+      && touch $out/$target.map.ok
+
+echo "aligning against $id = $target on $(hostname)"
+
+$time singularity run --bind /scratch,/expanse \
+      $wfmash -t $CPUS \
+      -i $in/$target.map.paf \
+      $seqs \
+      >$out/$target.aln.paf \
+      2>$out/$target.aln.log \
+      && touch $out/$target.aln.ok      
