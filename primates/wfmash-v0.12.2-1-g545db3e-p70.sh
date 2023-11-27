@@ -21,7 +21,7 @@ module load singularitypro
 CPUS=$(($SLURM_NTASKS_PER_NODE))
 base=/expanse/lustre/scratch/egarrison/temp_project/t2t-primates
 seqs=$base/primates13.20231122.fa.gz
-out=$base/p70_v2
+out=$base/primates13.20231122_wfmash-p70_v3
 mkdir -p $out
 
 id=$SLURM_ARRAY_TASK_ID
@@ -47,7 +47,7 @@ echo "aligning against $id = $target on $(hostname)"
 
 $time singularity run --bind /scratch,/expanse \
       $wfmash -t $CPUS \
-      -i $in/$target.map.paf \
+      -i $out/$target.map.paf \
       $seqs \
       >$out/$target.aln.paf \
       2>$out/$target.aln.log \
