@@ -23,7 +23,6 @@ and check you are on a CBCB node (got `cbcb00.umiacs.umd.edu`).
 module load gcc/11.2.0
 gcc -v
 ```
-```
 gives
 ```
 Using built-in specs.
