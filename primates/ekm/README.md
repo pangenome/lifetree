@@ -61,10 +61,11 @@ make && make install
 ```
 and then check static lib has been created here: `$SWDIR/jemalloc-install/lib`.
 
-**5.** Install [seqwish](https://github.com/ekg/seqwish.git). Note that last commit was []().
+**5.** Install [seqwish](https://github.com/ekg/seqwish.git). Note that last commit was [f44b402](https://github.com/ekg/seqwish/commit/f44b402f0c2e02988d431d9b2e5eba9727cf93a9).
 ```
 cd  $SWDIR
 git clone --recursive https://github.com/ekg/seqwish.git
 cd seqwish
 cmake -DCMAKE_INSTALL_PREFIX=/ -H. -Bbuild && cmake --build build -- -j 3
 ```
+This will fail so you need to `rm -rf build`, update [CMakeList](), and try again.
