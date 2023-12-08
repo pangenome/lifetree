@@ -84,7 +84,7 @@ wget https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20231205_wfmas
 tar -cvzf primates16.20231205_wfmash-v0.12.4.tar.gz
 ```
 
-**7.** Run [seqwish](./scripts/a_run_seqwish.sbatc)
+**7.** Run [seqwish](./scripts/a_run_seqwish.sbatch)
 ---
 ```
 cd /fs/cbcb-lab/ekmolloy/ekmolloy/lifetree/primates/ekm/scripts
