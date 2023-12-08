@@ -68,4 +68,4 @@ git clone --recursive https://github.com/ekg/seqwish.git
 cd seqwish
 cmake -DCMAKE_INSTALL_PREFIX=/ -H. -Bbuild && cmake --build build -- -j 3
 ```
-This will fail so you need to `rm -rf build`, update [CMakeList](), and try again.
+This will fail so you need to `rm -rf build`, update [CMakeLists.txt](./software/seqwish_CMakeLists.txt), and try again.
