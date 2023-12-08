@@ -86,3 +86,7 @@ tar -cvzf primates16.20231205_wfmash-v0.12.4.tar.gz
 
 **7.** Run seqwish
 ---
+```
+cd /fs/cbcb-lab/ekmolloy/ekmolloy/lifetree/primates/ekm/scripts
+sbatch [a_run_seqwish.sbatch](./scripts/a_run_seqwish.sbatch)
+```
