@@ -11,14 +11,14 @@ alias swork="srun --pty --ntasks=1 --mem=4GB --constraint=EPYC-7313 --qos=highme
 
 Installation of seqwish
 ---
-1. Start interactive job because need to do build on EPYC-7313.
+#1. Start interactive job because need to do build on EPYC-7313.
 ```
 swork
 uname -n
 ```
 and check you are on a CBCB node (got `cbcb00.umiacs.umd.edu`).
 
-2. Switch gcc version.
+#2. Switch gcc version.
 ```
 module load gcc/11.2.0
 gcc -v
