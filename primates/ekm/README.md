@@ -34,15 +34,24 @@ Thread model: posix
 Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC)
 ```
+Check you can find `libdl` by typing `whereis libdl`, which should give 
+```
+libdl: /usr/lib64/libdl.so /usr/lib64/libdl.a
+```
+Check you can find `zlib` by typing `whereis zlip`, which should give
+```
+zlib: /usr/include/zlib.h /usr/share/man/man3/zlib.3.gz
+```
+(Note you sometimes need to load `zlib` with command `module avail zlib`).
 
-**3.** Go to software directory
+**3.** Make path to software directory
 ```
 SWDIR=/fs/cbcb-lab/ekmolloy/ekmolloy/lifetree/primates/ekm/software
-cd $SWDIR
 ```
 
 **4.** Install [jemalloc](https://jemalloc.net). Note last commit was [e4817c8](https://github.com/jemalloc/jemalloc/commit/e4817c8d89a2a413e835c4adeab5c5c4412f9235).
 ```
+cd $SWDIR
 git clone https://github.com/jemalloc/jemalloc.git
 mkdir jemalloc-install
 cd jemalloc
@@ -51,3 +60,11 @@ cd jemalloc
 make && make install
 ```
 and then check static lib has been created here: `$SWDIR/jemalloc-install/lib`.
+
+**5.** Install [seqwish](https://github.com/ekg/seqwish.git). Note that last commit was []().
+```
+cd  $SWDIR
+git clone --recursive https://github.com/ekg/seqwish.git
+cd seqwish
+cmake -DCMAKE_INSTALL_PREFIX=/ -H. -Bbuild && cmake --build build -- -j 3
+```
