@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=2000gb
-#SBATCH --time=21-00:00:00
+#SBATCH --time=11-00:00:00
 #SBATCH --qos=highmem
 #SBATCH --partition=cbcb
 #SBATCH --account=cbcb
@@ -19,7 +19,7 @@ DATE="20231205"
 DATDIR="/fs/cbcb-lab/ekmolloy/primate_t2t_pangenome/data-$DATE"
 
 SEQS="$DATDIR/primates16.$DATE.fa"
-PAFS=$(ls -m $DATDIR/primates16.${DATE}_wfmash-v0.12.4/*paf | tr -d "\n" )
+PAFS=$(ls -m $DATDIR/primates16.${DATE}_wfmash-v0.12.4/*.aln.paf | tr -d "\n" )
 OUTG="$DATDIR/primates16.$DATE.gfa"
 
 uname -n
