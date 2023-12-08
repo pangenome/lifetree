@@ -70,5 +70,17 @@ cmake -DCMAKE_INSTALL_PREFIX=/ -H. -Bbuild && cmake --build build -- -j 3
 ```
 This will fail so you need to `rm -rf build`, update [CMakeLists.txt](./software/seqwish_CMakeLists.txt), and try again. and Check binary has been created here: `$SWDIR/seqwish/bin`.
 
-Run seqwish
+**6.** Download data
+---
+```
+DATDIR=/fs/cbcb-lab/ekmolloy/primate_t2t_pangenome/data-20231205
+mkdir $DATDIR
+cd $DATDIR
+wget https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20231205.fa.gz
+gunzip primates16.20231205.fa.gz
+wget https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20231205_wfmash-v0.12.4.tar.gz
+tar -cvzf primates16.20231205_wfmash-v0.12.4.tar.gz
+```
+
+**7.** Run seqwish
 ---
