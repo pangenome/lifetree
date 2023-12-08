@@ -11,14 +11,14 @@ alias swork="srun --pty --ntasks=1 --mem=4GB --constraint=EPYC-7313 --qos=highme
 
 Installation of seqwish
 ---
-#1. Start interactive job because need to do build on EPYC-7313.
+**1.** Start interactive job because need to do build on EPYC-7313.
 ```
 swork
 uname -n
 ```
 and check you are on a CBCB node (got `cbcb00.umiacs.umd.edu`).
 
-#2. Switch gcc version.
+**2.** Switch gcc version.
 ```
 module load gcc/11.2.0
 gcc -v
@@ -35,6 +35,19 @@ Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC)
 ```
 
-3. 
+**3.** Go to software directory
 ```
+SWDIR=/fs/cbcb-lab/ekmolloy/ekmolloy/lifetree/primates/ekm/software
+cd $SWDIR
 ```
+
+**4.** Install [jemalloc](https://jemalloc.net). Note last commit was [e4817c8](https://github.com/jemalloc/jemalloc/commit/e4817c8d89a2a413e835c4adeab5c5c4412f9235).
+```
+git clone https://github.com/jemalloc/jemalloc.git
+mkdir jemalloc-install
+cd jemalloc
+./autogen.sh
+./configure --prefix="$SWDIR/jemalloc-install"
+make && make install
+```
+and then check static lib has been created here: `$SWDIR/jemalloc-install/lib`.
