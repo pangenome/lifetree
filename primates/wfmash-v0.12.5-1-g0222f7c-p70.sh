@@ -21,7 +21,7 @@ module load singularitypro
 CPUS=$(($SLURM_NTASKS_PER_NODE))
 base=/expanse/lustre/scratch/egarrison/temp_project/t2t-primates
 seqs=$base/primates16.20231205.fa.gz
-out=$base/primates16.20231205_wfmash-v0.12.4
+out=$base/primates16.20231205_wfmash-v0.12.5
 mkdir -p $out
 
 id=$SLURM_ARRAY_TASK_ID
