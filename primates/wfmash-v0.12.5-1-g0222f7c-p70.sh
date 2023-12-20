@@ -35,6 +35,7 @@ $time singularity run --bind /scratch,/expanse \
       -m \
       -P $prefix \
       --one-to-one \
+      -Y '#' \
       -n 1 \
       -p 70 \
       -s 5k \
