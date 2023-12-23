@@ -6,6 +6,7 @@
 #SBATCH --error=wfmash_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
+#SBATCH --mem=249208M
 #SBATCH --time=2-00:00:00
 #SBATCH --partition=compute
 
