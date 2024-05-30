@@ -1,19 +1,14 @@
 #!/bin/bash
 #SBATCH --job-name=wfmash
-#SBATCH --account=TG-MCB140147
-#SBATCH --constraint="lustre"
-#SBATCH --output=wfmash_%j.out
-#SBATCH --error=wfmash_%j.err
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=128
-#SBATCH --mem=249208M
-#SBATCH --time=2-00:00:00
-#SBATCH --partition=compute
+#SBATCH --time=5-00:00:00
+#SBATCH --partition=skx
 
 # map vgp+477 to itself at 70% identity 5kb segments
 # skipping self alignments
 # using the one-to-one best mapping filter
 
+eval "$(micromamba shell hook --shell bash)"
 micromamba activate env
 
 wfmash=$(which wfmash)
@@ -21,9 +16,10 @@ time=/usr/bin/time
 
 # Determine number of CPUs to use
 CPUS=$(($SLURM_NTASKS_PER_NODE))
-base=/expanse/lustre/scratch/egarrison/temp_project/vgp
-seqs=$base/vgp+477.fa.gz
-out=$base/vgp+477_wfmash-v0.13.0
+base=$WORK
+scratch=$SCRATCH
+seqs=$WORK/vgp+477.fa.gz
+out=$SCRATCH/vgp+477_wfmash-v0.13.0
 mkdir -p $out
 
 id=$SLURM_ARRAY_TASK_ID
@@ -38,9 +34,10 @@ $time $wfmash -t $CPUS \
       --one-to-one \
       -Y '#' \
       -n 1 \
+      -k 19 \
       -p 70 \
       -s 5k \
-      -c 20k \
+      -c 20k \   
       $seqs \
       >$out/$target.map.paf \
       2>$out/$target.map.log \
