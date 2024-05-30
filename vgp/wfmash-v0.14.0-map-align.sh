@@ -2,31 +2,24 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=2-00:00:00
-#SBATCH --partition=spr
 
 # break on error
-set -e
+set -euo pipefail
 
-# load micromamba if needed
-#eval "$(micromamba shell hook --shell bash)"
-#micromamba activate base
 # our wfmash binary
 wfmash=$WORK/micromamba/bin/wfmash
 
-# Determine number of CPUs to use
-cpus=$SLURM_CPUS_ON_NODE
-work=$WORK
+seqs=$1
+jobs=$2
+id=$3
+out=$4
 
+cpus=$SLURM_CPUS_PER_TASK
 time=/usr/bin/time
-seqs=$work/vgp+477.fa.gz
 ls -l $seqs
-out=$work/by23
 mkdir -p $out
 
-id=$1
-echo $id
-
-spec=$(head -$id $work/vgp+477.by23query.txt | tail -1)
+spec=$(head -$id $jobs | tail -1)
 target=$(echo $spec | awk '{print $1}')
 query=$(echo $spec | awk '{print $2}')
 
