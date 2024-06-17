@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # wfmash.sh: run wfmash on a pair of sequences
 # for version v0.15.0
