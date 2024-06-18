@@ -4,7 +4,7 @@
 #SBATCH --error=%x.e%j
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=48
-#SBATCH --time=00:10:00
+#SBATCH --time=2-00:00:00
 
 # note: must specify --nodes=N on command line
 
