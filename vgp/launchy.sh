@@ -10,6 +10,7 @@
 
 cmdfile=$1
 
+module load python
 module load pylauncher
 
 python -c "from pylauncher import ClassicLauncher; ClassicLauncher('"$cmdfile"')"
