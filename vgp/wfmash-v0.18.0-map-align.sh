@@ -48,6 +48,7 @@ map_out=$out/$id.$target.map
         -p 70 \
         -s 5k \
         -c 30k \
+        -P 50k \
         $seqs \
         >$map_out.paf ) 2>$map_out.log
 touch $map_out.ok
