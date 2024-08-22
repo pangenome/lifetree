@@ -31,12 +31,12 @@ query=$(echo $spec | awk '{print $2}')
 mm3idx=$SCRATCH/idxs/$target.mm3
 
 echo "wfmash mapping $id = $target against $query on $(hostname) with $cpus CPUs at $(date +%s) / $(date) with $(which wfmash)"
-wfmash-v0.19.0-0-gc95b6a3 --version
+wfmash-v0.19.0-3-gb811396 --version
 
 map_out=$out/$id.$target.map
 
 ( $timer -f "$fmt" \
-   wfmash-v0.19.0-0-gc95b6a3 \
+   wfmash-v0.19.0-3-gb811396 \
         -t $cpus_for_mapping \
         -m \
         --mm-index $mm3idx \
@@ -48,7 +48,6 @@ map_out=$out/$id.$target.map
         -p 70 \
         -s 5k \
         -c 30k \
-        -P 100k \
         $seqs \
         >$map_out.paf ) 2>$map_out.log
 touch $map_out.ok
@@ -57,7 +56,7 @@ echo "wfmash aligning $id = $target against $query on $(hostname) with $cpus CPU
 
 aln_out=$out/$id.$target.aln
 ( $timer -f "$fmt" \
-    wfmash-v0.19.0-0-gc95b6a3 \
+    wfmash-v0.19.0-3-gb811396 \
         -t $cpus_for_aligning \
         -i $map_out.paf \
         $seqs \
