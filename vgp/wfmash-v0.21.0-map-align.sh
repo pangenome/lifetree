@@ -28,7 +28,7 @@ mkdir -p $out
 spec=$(head -$id $jobs | tail -1)
 target=$(echo $spec | awk '{print $1}')
 query=$(echo $spec | awk '{print $2}')
-mm3idx=$SCRATCH/idxs/$target.mm3
+mm3idx=$SCRATCH/idxv2/$target.mm3
 
 echo "wfmash mapping $id = $target against $query on $(hostname) with $cpus CPUs at $(date +%s) / $(date) with $(which wfmash)"
 wfmash-v0.21.0-0-g4521c10 --version
