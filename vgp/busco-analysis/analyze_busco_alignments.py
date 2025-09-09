@@ -189,7 +189,7 @@ def main():
     if args.summary_output:
         with open(args.summary_output, 'w') as summary_file:
             # Write header
-            summary_file.write('\t'.join(['total_analyzed', 'missing', 'incomplete', 'wrong_location', 'good']) + '\n')
+            summary_file.write('\t'.join(['total_analyzed', 'missing', 'incomplete', 'wrong_location_too', 'good']) + '\n')
             # Write data
             summary_file.write('\t'.join([
                 str(len(results)),
@@ -199,15 +199,6 @@ def main():
                 str(stats['good'])
             ]) + '\n')
         print(f"Summary statistics written to {args.summary_output}", file=sys.stderr)
-    
-    # Print summary to stderr (keep existing behavior)
-    print(f"\n=== Summary Statistics ===\n"
-          f"Total BUSCO genes analyzed: {len(results)}\n"
-          f"Missing (no alignments): {stats['missing']}\n"
-          f"Incomplete (<90% coverage): {stats['incomplete']}\n"
-          f"Wrong location too: {stats['wrong']}\n"
-          f"Good (single region, >90% coverage, correct location): {stats['good']}", 
-          file=sys.stderr)
 
 if __name__ == '__main__':
     main()
