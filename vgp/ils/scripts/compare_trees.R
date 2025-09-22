@@ -1,7 +1,11 @@
 #!/usr/bin/env Rscript
+options(scipen = 10000)
+
 suppressPackageStartupMessages({
   library(tidyverse)
   library(ape)
+  library(ggplot2)
+  library(scales)
 })
 
 # Function to determine topology for 3-taxon tree
@@ -41,22 +45,30 @@ get_topology <- function(tree_file) {
 # Get all newick files
 tree_files <- list.files("apes-chm13", pattern = "\\.nwk$", full.names = TRUE)
 
-# Process each tree with corrected parsing
+# Process each tree
 results <- tibble(file = tree_files) %>%
   mutate(
     basename = basename(file),
-    # Extract the full region string after "apes."
     region_full = gsub("^apes\\.", "", gsub("\\.nwk$", "", basename)),
-    # Extract chromosome (everything before the last two underscores)
     chr = gsub("_[0-9]+_[0-9]+$", "", region_full),
-    # Extract start position
     start = as.numeric(gsub(".*_([0-9]+)_[0-9]+$", "\\1", region_full)),
-    # Extract end position  
     end = as.numeric(gsub(".*_([0-9]+)$", "\\1", region_full)),
-    # Get topology
     topology = map_chr(file, get_topology)
   ) %>%
   arrange(chr, start)
+
+# Clean chromosome names and convert positions to Mbp
+results <- results %>%
+  mutate(
+    chr_clean = gsub(".*#", "", chr),
+    start_mbp = start / 1e6,
+    end_mbp = end / 1e6,
+    midpoint_mbp = (start_mbp + end_mbp) / 2
+  )
+
+# Create factor levels for chromosomes
+chrom_levels <- c(paste0("chr", 1:22), "chrX", "chrY", "chrM")
+results$chr_clean <- factor(results$chr_clean, levels = chrom_levels)
 
 # Summary statistics
 cat("\n=== Topology Summary ===\n")
@@ -66,51 +78,111 @@ print(topology_counts)
 cat("\n=== Percentage of each topology ===\n")
 print(round(prop.table(topology_counts) * 100, 2))
 
-# Write detailed results
-write_tsv(results %>% select(chr, start, end, topology, file), 
-          "tree_topology_comparison.tsv")
+# Create the wide format plot
+p_ils_wide <- ggplot(results) +
+  # Add rectangles for each topology region
+  geom_rect(aes(xmin = start_mbp, xmax = end_mbp, 
+                ymin = 0, ymax = 1, 
+                fill = topology),
+            alpha = 0.9) +
+  
+  # Facet by chromosome with free x scales
+  facet_grid(rows = vars(chr_clean), scales = "free_x", switch = "y") +
+  
+  # Color scheme matching your original
+  scale_fill_manual(
+    values = c(
+      "species_tree" = "#00BA38",  # Green
+      "ILS_HB" = "#F8766D",        # Red
+      "ILS_HC" = "#619CFF",        # Blue
+      "equal" = "gray80",
+      "NA" = "white"
+    ),
+    name = "Topology"
+  ) +
+  
+  # Set x-axis 
+  scale_x_continuous(
+    breaks = scales::pretty_breaks(n = 5),
+    expand = c(0.01, 0)
+  ) +
+  
+  # Fixed y-axis since we're just showing presence/absence
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = NULL
+  ) +
+  
+  labs(
+    title = "Incomplete Lineage Sorting (ILS) Patterns Across Primate Genomes",
+    subtitle = "Human-Chimpanzee-Bonobo topology analysis using IMPG",
+    x = "Position (Mbp)",
+    y = NULL
+  ) +
+  
+  theme_minimal() +
+  theme(
+    # Facet strip styling
+    strip.text.y.left = element_text(size = 9, angle = 0),
+    strip.background = element_rect(fill = "gray95", color = NA),
+    strip.placement = "outside",
+    
+    # Axis styling
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 8),
+    axis.title = element_text(size = 11),
+    axis.ticks.y = element_blank(),
+    
+    # Title styling
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5, color = "gray40"),
+    
+    # Panel and grid styling
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "gray90", linewidth = 0.2),
+    panel.grid.major.y = element_blank(),
+    panel.spacing = unit(0.1, "lines"),
+    panel.border = element_rect(color = "gray80", fill = NA, linewidth = 0.3),
+    
+    # Legend styling
+    legend.position = "bottom",
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.text = element_text(size = 9),
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(1.5, "cm")
+  )
 
-# Find ILS regions - create proper BED format
-ils_regions <- results %>%
-  filter(topology %in% c("ILS_HB", "ILS_HC")) %>%
-  mutate(
-    # Create clean chromosome name for BED
-    chr_clean = gsub(".*#", "", chr)  # Remove "chm13#1#" prefix to get just "chr1"
+# Save the plot
+ggsave("ILS_topology_by_chromosome.pdf", p_ils_wide, 
+       width = 14, height = 10, dpi = 300)
+ggsave("ILS_topology_by_chromosome.png", p_ils_wide, 
+       width = 14, height = 10, dpi = 300)
+
+cat("\n=== Plots saved ===\n")
+cat("- ILS_topology_by_chromosome.pdf\n")
+cat("- ILS_topology_by_chromosome.png\n")
+
+# Create summary by chromosome
+chr_summary <- results %>%
+  group_by(chr_clean) %>%
+  summarise(
+    total_regions = n(),
+    species_tree = sum(topology == "species_tree", na.rm = TRUE),
+    ILS_HB = sum(topology == "ILS_HB", na.rm = TRUE),
+    ILS_HC = sum(topology == "ILS_HC", na.rm = TRUE),
+    pct_ILS = round((ILS_HB + ILS_HC) / total_regions * 100, 1),
+    .groups = "drop"
   ) %>%
-  select(chr_clean, start, end, topology) %>%
-  rename(chr = chr_clean)
+  arrange(chr_clean)
 
-write_tsv(ils_regions, "ILS_regions.bed", col_names = FALSE)
+cat("\n=== ILS Summary by Chromosome ===\n")
+print(as.data.frame(chr_summary))
 
-cat("\nResults written to:\n")
-cat("- tree_topology_comparison.tsv (all regions with headers)\n")
-cat("- ILS_regions.bed (regions showing ILS, BED format)\n")
+# Write results
+write_tsv(results %>% select(chr_clean, start, end, start_mbp, end_mbp, topology), 
+          "ILS_topology_results.tsv")
+write_tsv(chr_summary, "ILS_summary_by_chromosome.tsv")
 
-# Create visualization if we have valid coordinates
-if(all(!is.na(results$start))) {
-  library(ggplot2)
-  
-  # Clean chromosome names for plotting
-  plot_data <- results %>%
-    mutate(chr_clean = gsub(".*#", "", chr))
-  
-  p <- ggplot(plot_data, aes(x = start, y = 1, fill = topology)) +
-    geom_tile(aes(width = end - start, height = 0.5)) +
-    facet_wrap(~chr_clean, scales = "free_x", ncol = 1) +
-    scale_fill_manual(values = c("species_tree" = "green", 
-                                "ILS_HB" = "red", 
-                                "ILS_HC" = "blue",
-                                "equal" = "gray",
-                                "NA" = "white")) +
-    theme_minimal() +
-    labs(title = "Tree topology along chromosomes",
-         x = "Position", y = "", fill = "Topology") +
-    theme(axis.text.y = element_blank())
-  
-  ggsave("topology_changes.pdf", p, width = 12, height = 8)
-  cat("- topology_changes.pdf (visualization)\n")
-}
-
-# Print first few ILS regions to verify
-cat("\n=== First few ILS regions ===\n")
-print(head(ils_regions))
+cat("\n=== Files written ===\n")
+cat("- ILS_topology_results.tsv\n")
+cat("- ILS_summary_by_chromosome.tsv\n")
