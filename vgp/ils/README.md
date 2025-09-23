@@ -30,12 +30,14 @@ parallel -j 48 --colsep '\t' \
      -r {1}:{2}-{3} \
      --transitive \
      --sequence-files /lizardfs/guarracino/vgp/apes/*.pansn.fa.gz \
-     -o fasta \
+     -o fasta | seqkit rmdup -s - \
      > apes-chm13/apes.{1}_{2}_{3}.fa && samtools faidx apes-chm13/apes.{1}_{2}_{3}.fa && \
      wfmash apes-chm13/apes.{1}_{2}_{3}.fa > apes-chm13/apes.{1}_{2}_{3}.paf && \
-     seqwish -s apes-chm13/apes.{1}_{2}_{3}.fa -p apes-chm13/apes.{1}_{2}_{3}.paf -g apes-chm13/apes.{1}_{2}_{3}.gfa && \
+     seqwish -s apes-chm13/apes.{1}_{2}_{3}.fa -p apes-chm13/apes.{1}_{2}_{3}.paf -g apes-chm13/apes.{1}_{2}_{3}.gfa --temp-dir /scratch && \
      odgi similarity -i apes-chm13/apes.{1}_{2}_{3}.gfa --delim "#" --delim-pos 1 --distances --all > apes-chm13/apes.{1}_{2}_{3}.similarity.tsv && \
      Rscript /lizardfs/guarracino/vgp/apes/make_tree.R apes-chm13/apes.{1}_{2}_{3}.similarity.tsv'
+     
+# "seqkit rmdup -s -" to patch a buggy behavior of impg query that outputs duplicated sequences in FASTA formats with transitive queries
 
 Rscript /lizardfs/guarracino/vgp/apes/compare_trees.R
 ```
